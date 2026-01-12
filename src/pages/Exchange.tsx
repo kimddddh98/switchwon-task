@@ -1,5 +1,11 @@
+import Header from '@/components/Header'
+
 const Exchange = () => {
-  return <div>환전페이지</div>
+  return (
+    <div>
+      <Header />
+    </div>
+  )
 }
 
 export default Exchange
