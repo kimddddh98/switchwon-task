@@ -14,7 +14,7 @@ const Exchange = () => {
           </h2>
           <p className="text-xl">실시간 환율을 확인하고 간편하게 환전하세요.</p>
         </div>
-        <section className="flex gap-6">
+        <section className="flex gap-6 pb-12">
           <div className="flex flex-1 flex-col gap-6">
             <div className="flex gap-5">
               <ExchangeInfoCard />

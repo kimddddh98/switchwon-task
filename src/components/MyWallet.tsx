@@ -1,11 +1,11 @@
 const MyWallet = () => {
   return (
-    <div className="bg-switchwon-gray-0 border-switchwon-gray-300 flex flex-col gap-8 rounded-2xl border px-8 py-6">
+    <div className="bg-switchwon-gray-0 border-switchwon-gray-300 flex flex-1 flex-col gap-8 rounded-2xl border px-8 py-6">
       <h3 className="text-switchwon-gray-800 text-2xl font-extrabold">
         내 지갑
       </h3>
-      <div className="flex flex-col">
-        <ul>
+      <div className="flex flex-1 flex-col">
+        <ul className="flex-1">
           <li className="text-switchwon-gray-600 flex justify-between text-xl">
             <span className="font-medium">KRW</span>
             <b className="font-semibold">3,000,000</b>
