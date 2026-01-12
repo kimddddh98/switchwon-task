@@ -5,6 +5,7 @@ import { ROUTES } from './routes/path.ts'
 import Home from './pages/Home.tsx'
 import '@/global.css'
 import SignIn from './pages/SignIn.tsx'
+import Exchange from './pages/Exchange.tsx'
 
 const router = createBrowserRouter([
   {
@@ -14,6 +15,10 @@ const router = createBrowserRouter([
   {
     path: ROUTES.SIGN_IN,
     element: <SignIn />,
+  },
+  {
+    path: ROUTES.Exchange,
+    element: <Exchange />,
   },
 ])
 
