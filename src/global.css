@@ -1,11 +1,17 @@
 @import "./styles/_fonts.css";
 @import "tailwindcss";
 @theme inline {
+  --color-switchwon-gray-800:#28323C;
   --color-switchwon-gray-700:#374553;
   --color-switchwon-gray-600:#646F7C;
+  --color-switchwon-gray-400:#C5C8CE;
   --color-switchwon-gray-300:#D0D6DB;
   --color-switchwon-gray-0:#F7F8F9;
   --color-switchwon-cta-1:#1B2334;
+  --color-switchwon-blue-500:#3479EB;
+  --color-switchwon-blue-disabled:#9DB6FF;
+  --color-switchwon-red:#FE5050;
+  --color-switchwon-red-disabled:#FFA7A7;
 }
 
 
