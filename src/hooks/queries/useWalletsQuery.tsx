@@ -8,6 +8,9 @@ const useWalletsQuery = () => {
     queryFn: getWallets,
     queryKey: exchangeKey.wallets(),
     enabled: !!getAccessToken(),
+    refetchInterval: (data) => {
+      return data.state.status === 'success' ? 60000 : false
+    },
   })
 }
 export default useWalletsQuery
