@@ -6,6 +6,7 @@ import Home from './pages/Home.tsx'
 import '@/global.css'
 import SignIn from './pages/SignIn.tsx'
 import Exchange from './pages/Exchange.tsx'
+import ExchangeList from './pages/ExchangeList.tsx'
 
 const router = createBrowserRouter([
   {
@@ -17,8 +18,12 @@ const router = createBrowserRouter([
     element: <SignIn />,
   },
   {
-    path: ROUTES.Exchange,
+    path: ROUTES.EXCHANGE,
     element: <Exchange />,
+  },
+  {
+    path: ROUTES.EXCHANGE_LIST,
+    element: <ExchangeList />,
   },
 ])
 
