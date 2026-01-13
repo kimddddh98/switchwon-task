@@ -1,7 +1,7 @@
 import ExchangeAction from '@/components/ExchangeAction'
 import ExchangeInfoCard from '@/components/ExchangeInfoCard'
 import MyWallet from '@/components/MyWallet'
-import useExchangeRatesQuery from '@/hooks/useExchangeRatesQuery'
+import useExchangeRatesQuery from '@/hooks/queries/useExchangeRatesQuery'
 
 const Exchange = () => {
   const { data } = useExchangeRatesQuery()
