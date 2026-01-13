@@ -7,6 +7,10 @@ import '@/global.css'
 import SignIn from './pages/SignIn.tsx'
 import Exchange from './pages/Exchange.tsx'
 import ExchangeList from './pages/ExchangeList.tsx'
+import React from 'react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+
+const queryClient = new QueryClient()
 
 const router = createBrowserRouter([
   {
@@ -28,5 +32,9 @@ const router = createBrowserRouter([
 ])
 
 createRoot(document.getElementById('root')!).render(
-  <RouterProvider router={router} />,
+  <React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
+  </React.StrictMode>,
 )
