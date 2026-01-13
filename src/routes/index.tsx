@@ -6,6 +6,7 @@ import Exchange from '@/pages/Exchange'
 import ExchangeList from '@/pages/ExchangeList'
 import ProtectedRoute from './ProtectedRoute'
 import PublicRoute from './PublicRoute'
+import ExchangeLayout from '@/components/ExchangeLayout'
 
 export const router = createBrowserRouter([
   {
@@ -25,12 +26,25 @@ export const router = createBrowserRouter([
     element: <ProtectedRoute />,
     children: [
       {
-        path: ROUTES.EXCHANGE,
-        element: <Exchange />,
-      },
-      {
-        path: ROUTES.EXCHANGE_LIST,
-        element: <ExchangeList />,
+        element: <ExchangeLayout />,
+        children: [
+          {
+            path: ROUTES.EXCHANGE,
+            element: <Exchange />,
+            handle: {
+              title: '환율 정보',
+              description: '실시간 환율을 확인하고 간편하게 환전하세요.',
+            },
+          },
+          {
+            path: ROUTES.EXCHANGE_LIST,
+            element: <ExchangeList />,
+            handle: {
+              title: '환전 내역',
+              description: '환전 내역을 확인하실 수 있어요.',
+            },
+          },
+        ],
       },
     ],
   },
