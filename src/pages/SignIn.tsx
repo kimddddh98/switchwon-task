@@ -8,8 +8,14 @@ type SignInValues = {
   email: string
 }
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
 const SignIn = () => {
-  const { register, handleSubmit } = useForm<SignInValues>()
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignInValues>()
   const { login } = useAuth()
   const navigate = useNavigate()
   const { mutate, isPending } = useMutation({
@@ -40,13 +46,22 @@ const SignIn = () => {
           이메일 주소를 입력해주세요.
         </p>
         <input
+          id="email"
           type="email"
           placeholder="email@example.com"
           {...register('email', {
             required: '이메일을 입력해주세요',
+            pattern: {
+              value: EMAIL_REGEX,
+              message: '올바른 이메일 형식이 아닙니다.',
+            },
           })}
-          className="text-switchwon-gray-600 border-switchwon-gray-700 mt-3 rounded-xl border bg-white p-6 text-xl font-semibold"
+          className={`text-switchwon-gray-600 border-switchwon-gray-700 mt-3 rounded-xl border bg-white p-6 text-xl font-semibold ${errors.email ? 'border-switchwon-red' : 'border-switchwon-gray-700'}`}
         />
+        {errors.email && (
+          <p className="text-switchwon-red mt-2">{errors.email.message}</p>
+        )}
+
         <button
           type="submit"
           disabled={isPending}
