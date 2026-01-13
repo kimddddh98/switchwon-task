@@ -14,6 +14,13 @@
   --color-switchwon-red-disabled:#FFA7A7;
 }
 
+@layer base {
+  input,
+  textarea,
+  select {
+    @apply outline-none focus:outline-none focus:ring-0;
+  }
+}
 
 body{
   font-family: 'Pretendard';
