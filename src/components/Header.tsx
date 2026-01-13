@@ -7,11 +7,14 @@ const Header = () => {
       <div className="text-2xl font-bold">Exchange app</div>
       <nav className="flex items-center gap-10">
         <div>
-          <NavLink to={'/'} className={`px-3 py-2 text-xl font-bold`}>
+          <NavLink
+            to={ROUTES.EXCHANGE}
+            className={`px-3 py-2 text-xl font-bold`}
+          >
             환전 하기
           </NavLink>
           <NavLink
-            to={'/'}
+            to={ROUTES.EXCHANGE_LIST}
             className="px-3 py-2 text-xl font-medium text-[#8899AA]"
           >
             환전 내역

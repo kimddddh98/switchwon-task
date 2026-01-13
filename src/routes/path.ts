@@ -2,5 +2,7 @@
 export const ROUTES = {
   HOME: '/',
   SIGN_IN : "/sign-in",
-  Exchange:"/exchange"
+  EXCHANGE:"/exchange",
+  EXCHANGE_LIST:"/exchange-list",
+
 } as const
