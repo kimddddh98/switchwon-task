@@ -1,7 +1,12 @@
+import { useAuth } from '@/hooks/useAuth'
 import { ROUTES } from '@/routes/path'
 import { NavLink } from 'react-router-dom'
 
 const Header = () => {
+  const { logout } = useAuth()
+  const handleLogout = () => {
+    logout()
+  }
   return (
     <header className="border-b-switchwon-gray-300 flex h-[75px] items-center justify-between border-b px-10">
       <div className="text-2xl font-bold">Exchange app</div>
@@ -20,12 +25,12 @@ const Header = () => {
             환전 내역
           </NavLink>
         </div>
-        <NavLink
-          to={ROUTES.SIGN_IN}
+        <button
+          onClick={handleLogout}
           className="bg-switchwon-blue-500 rounded-2xl px-3 py-2 text-xl font-semibold text-white"
         >
           Log out
-        </NavLink>
+        </button>
       </nav>
     </header>
   )
