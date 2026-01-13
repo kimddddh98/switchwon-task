@@ -15,6 +15,15 @@ export interface ExchangeRate {
   changePercentage: number
   applyDateTime: string
 }
+export interface WalletsResponse {
+  totalKrwBalance: number
+  wallets: Wallets[]
+}
+export interface Wallets {
+  walletId: number
+  currency: string
+  balance: number
+}
 
 const getExchangeRates = async () => {
   const response = await http.get<BaseResponse<ExchangeRate[]>>(
@@ -24,7 +33,9 @@ const getExchangeRates = async () => {
 }
 
 const getWallets = async () => {
-  const response = await http.get(EXCHANGE_ENDPOINTS.WALLETS)
+  const response = await http.get<BaseResponse<WalletsResponse>>(
+    EXCHANGE_ENDPOINTS.WALLETS,
+  )
   return response.data.data
 }
 
