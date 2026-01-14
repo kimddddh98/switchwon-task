@@ -13,15 +13,19 @@ export const ORDERS_ENDPOINTS = {
   OREDRS_QUOTE: '/orders/quote',
 } as const
 
-export type OrdersQuoteRequestQuery = {
+export interface OrdersQuoteRequestQuery {
   fromCurrency: string
   toCurrency: string
   forexAmount: number
 }
 
-export type OrdersQuoteResponseType = {
+export interface OrdersQuoteResponseType {
   krwAmount: number
   appliedRate: number
+}
+
+export interface RquestOrdersParams extends OrdersQuoteRequestQuery {
+  exchangeRateId: number
 }
 
 const getOrdersQuote = async (query: OrdersQuoteRequestQuery) => {
@@ -35,4 +39,10 @@ const getOrdersQuote = async (query: OrdersQuoteRequestQuery) => {
   return response.data.data
 }
 
-export { getOrdersQuote }
+const requestOrder = async (params: RquestOrdersParams) => {
+  const response = await http.post(ORDERS_ENDPOINTS.OREDRS, params)
+
+  return response.data.data
+}
+
+export { getOrdersQuote, requestOrder }
