@@ -215,7 +215,9 @@ const ExchangeAction = () => {
         </div>
         <div className="border-t-switchwon-gray-400 flex justify-between border-t pt-8 text-xl">
           <span className="text-switchwon-gray-600 font-medium">적용 환율</span>
-          <b className="text-switchwon-blue-500 font-bold">{appliedRate} 원</b>
+          <b className="text-switchwon-gray-600 text-xl font-semibold">
+            {appliedRate} 원
+          </b>
         </div>
 
         <button className="bg-switchwon-cta-1 mt-8 h-[77px] rounded-2xl text-[22px] font-bold text-white">
