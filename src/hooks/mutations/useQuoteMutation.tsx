@@ -1,15 +1,35 @@
+import type { ExchangeRate } from '@/api/exchange'
 import { getOrdersQuote, type OrdersQuoteRequestQuery } from '@/api/orders'
-import { useMutation } from '@tanstack/react-query'
+import type { OrderActionType } from '@/const/orders.const'
+import { exchangeKey } from '@/const/query-key/exchangeKey.const'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+
+interface OrdersQuoteMutation extends OrdersQuoteRequestQuery {
+  actionState: OrderActionType
+}
 
 const useQuoteMutation = () => {
+  const queryClient = useQueryClient()
   const quoteMutation = useMutation({
-    mutationFn: (query: OrdersQuoteRequestQuery) => getOrdersQuote(query),
-    onSuccess(data) {
-      /* 
-        TODO
-        성공시 적용 환율과 현재 조회되어있는 환율 정보가 다를시 해당 데이터 업데이트
-      */
-      console.log('onSuccess', data)
+    mutationFn: (query: OrdersQuoteMutation) => getOrdersQuote(query),
+    onSuccess: async (data, variables) => {
+      await queryClient.cancelQueries({ queryKey: exchangeKey.exchnageRates() })
+      queryClient.setQueryData(
+        exchangeKey.exchnageRates(),
+        (oldData: ExchangeRate[]) => {
+          if (oldData) {
+            return oldData.map((ex) =>
+              ex.currency ===
+              (variables.actionState === 'BUY'
+                ? variables.toCurrency
+                : variables.fromCurrency)
+                ? { ...ex, rate: data.appliedRate }
+                : ex,
+            )
+          }
+          return oldData
+        },
+      )
     },
   })
 

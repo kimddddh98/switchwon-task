@@ -1,74 +1,107 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import debounce from 'lodash.debounce'
 import ChevronDownIcon from '@/assets/icons/chevron-down.svg?react'
 import {
   Controller,
   useForm,
   type ControllerRenderProps,
 } from 'react-hook-form'
-import { formatNumber } from '@/utiles'
+import { formatNumber, getCurrencyKrName } from '@/utiles'
 import useQuoteMutation from '@/hooks/mutations/useQuoteMutation'
-type OrdersFormValue = {
-  amount: string
-}
+import { useQueryClient } from '@tanstack/react-query'
+import { exchangeKey } from '@/const/query-key/exchangeKey.const'
+import type { ExchangeRate } from '@/api/exchange'
+import ExchangeLayer from './ExchangeLayer'
+import {
+  CURRENCIES,
+  CURRENCY_VALUE,
+  type CurrencyType,
+} from '@/const/currency.const'
+import { ORDER_ACTION, type OrderActionType } from '@/const/orders.const'
 
-type ExchangeActionType = 'BUY' | 'SELL'
-
-const EXCAHNGE_ACTION: Record<ExchangeActionType, ExchangeActionType> = {
-  BUY: 'BUY',
-  SELL: 'SELL',
-} as const
-
-const ExchangeLayer = () => {
-  return (
-    <ul className="border-switchwon-gray-200 animate-fade-in absolute top-[calc(100%+8px)] left-0 w-[140px] rounded-2xl border bg-white py-2">
-      <li>
-        <button className="flex w-full items-center gap-3 py-3 pl-4 text-sm hover:bg-[#F7F8FA]">
-          🇺🇸
-          <span className="font-medium">미국 USD</span>
-        </button>
-      </li>
-      <li>
-        <button className="flex w-full items-center gap-3 py-3 pl-4 text-sm hover:bg-[#F7F8FA]">
-          🇯🇵
-          <span className="font-medium">일본 JPY</span>
-        </button>
-      </li>
-    </ul>
-  )
+type QuoteFormValue = {
+  forexAmount: string
 }
 
 const ExchangeAction = () => {
+  const queryClient = useQueryClient()
   const { quoteMutation } = useQuoteMutation()
 
-  const { control, handleSubmit } = useForm<OrdersFormValue>({
+  const exchangeData = queryClient.getQueryData<ExchangeRate[]>(
+    exchangeKey.exchnageRates(),
+  )
+
+  const { control, handleSubmit } = useForm<QuoteFormValue>({
     defaultValues: {
-      amount: '0',
+      forexAmount: '0',
     },
   })
-  const [actionState, setActionState] = useState<ExchangeActionType>(
-    EXCAHNGE_ACTION.BUY,
+  /* 사기 / 팔기 */
+  const [actionState, setActionState] = useState<OrderActionType>(
+    ORDER_ACTION.BUY,
+  )
+  /* USD / JPY */
+  const [currencyState, setCurrencyState] = useState<CurrencyType>(
+    CURRENCY_VALUE.USD,
   )
   const [layerVisible, setLayerVisible] = useState(false)
 
-  const handleActionState = (state: ExchangeActionType) => {
+  /* 견적 조회 시 적용 환율 */
+  const appliedRate = useMemo(() => {
+    let defaultText = `1 ${currencyState} = `
+    if (quoteMutation.data) {
+      return (defaultText += formatNumber(quoteMutation.data.appliedRate))
+    }
+    const findExchangeData = exchangeData?.find(
+      (ex) => ex.currency === currencyState,
+    )
+    if (findExchangeData) {
+      return (defaultText += formatNumber(findExchangeData.rate))
+    }
+    defaultText += 0
+
+    return defaultText
+  }, [currencyState, quoteMutation, exchangeData])
+
+  const debouncedMutate = useMemo(
+    () => debounce(quoteMutation.mutate, 300),
+    [quoteMutation.mutate],
+  )
+
+  const handleActionState = (state: OrderActionType) => {
     setActionState(state)
   }
   const handleLayerToggle = () => {
     setLayerVisible((prev) => !prev)
   }
+  const handleCurrencyState = (state: CurrencyType) => {
+    quoteMutation.reset()
+    setCurrencyState(state)
+    handleLayerToggle()
+  }
 
   const handleNumberChange = (
     e: React.ChangeEvent<HTMLInputElement>,
-    field: ControllerRenderProps<OrdersFormValue, 'amount'>,
+    field: ControllerRenderProps<QuoteFormValue, 'forexAmount'>,
   ) => {
     const raw = e.target.value.replace(/,/g, '')
     if (!/^\d*\.?\d*$/.test(raw)) return
-    const [int, decimal] = raw.split('.')
+    const [_, decimal] = raw.split('.')
     if (decimal && decimal.length > 2) {
       alert('소숫점 2번째 자리까지 입력 가능합니다.')
       return
     }
     field.onChange(raw)
+    if (Number(raw) > 0) {
+      debouncedMutate({
+        forexAmount: Number(raw),
+        fromCurrency: actionState === ORDER_ACTION.BUY ? 'KRW' : currencyState,
+        toCurrency: actionState === ORDER_ACTION.BUY ? currencyState : 'KRW',
+        actionState,
+      })
+    } else {
+      quoteMutation.reset()
+    }
   }
 
   const formatValue = (value: string) => {
@@ -81,33 +114,48 @@ const ExchangeAction = () => {
     return formatNumber(Number(value))
   }
 
+  const onSubmit = ({ forexAmount }: QuoteFormValue) => {
+    quoteMutation.mutate({
+      forexAmount: Number(forexAmount),
+      fromCurrency: actionState === ORDER_ACTION.BUY ? 'KRW' : currencyState,
+      toCurrency: actionState === ORDER_ACTION.BUY ? currencyState : 'KRW',
+      actionState,
+    })
+  }
+
+  useEffect(() => {
+    return () => {
+      debouncedMutate.cancel()
+    }
+  }, [debouncedMutate])
+
   return (
     <div className="bg-switchwon-gray-0 border-switchwon-gray-300 flex flex-col gap-8 rounded-2xl border px-8 py-6">
-      <form className="flex flex-col gap-4">
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
         <div className="relative">
           <button
             type="button"
             onClick={handleLayerToggle}
             className="text-switchwon-gray-800 inline-flex items-center gap-1 text-xl font-bold"
           >
-            🇺🇸 USD 환전하기
+            {CURRENCIES[currencyState].icon + ' ' + currencyState} 환전하기
             <ChevronDownIcon className={`${!layerVisible && 'rotate-180'}`} />
           </button>
-          {layerVisible && <ExchangeLayer />}
+          {layerVisible && <ExchangeLayer onClick={handleCurrencyState} />}
         </div>
 
         <div className="border-switchwon-gray-300 flex rounded-2xl border bg-white p-3">
           <button
             type="button"
-            onClick={() => handleActionState(EXCAHNGE_ACTION.BUY)}
-            className={`flex-1 rounded-2xl py-4 text-xl font-bold transition ${actionState === EXCAHNGE_ACTION.BUY ? 'bg-switchwon-red text-white' : 'text-switchwon-red-disabled'}`}
+            onClick={() => handleActionState(ORDER_ACTION.BUY)}
+            className={`flex-1 rounded-2xl py-4 text-xl font-bold transition ${actionState === ORDER_ACTION.BUY ? 'bg-switchwon-red text-white' : 'text-switchwon-red-disabled'}`}
           >
             살래요
           </button>
           <button
             type="button"
-            onClick={() => handleActionState(EXCAHNGE_ACTION.SELL)}
-            className={`flex-1 rounded-2xl py-4 text-xl font-bold transition ${actionState === EXCAHNGE_ACTION.SELL ? 'bg-switchwon-blue-500 text-white' : 'text-switchwon-blue-disabled'}`}
+            onClick={() => handleActionState(ORDER_ACTION.SELL)}
+            className={`flex-1 rounded-2xl py-4 text-xl font-bold transition ${actionState === ORDER_ACTION.SELL ? 'bg-switchwon-blue-500 text-white' : 'text-switchwon-blue-disabled'}`}
           >
             팔래요
           </button>
@@ -116,11 +164,11 @@ const ExchangeAction = () => {
         <div className="flex flex-col gap-4 pb-20">
           <div className="flex flex-col">
             <span className="text-switchwon-gray-600 text-xl font-medium">
-              {actionState === EXCAHNGE_ACTION.BUY ? '매수' : '매도'} 금액
+              {actionState === ORDER_ACTION.BUY ? '매수' : '매도'} 금액
             </span>
             <div className="border-switchwon-gray-700 text-switchwon-gray-600 mt-3 flex items-center gap-2.5 rounded-xl border bg-white p-4 text-right text-xl font-medium">
               <Controller
-                name="amount"
+                name="forexAmount"
                 control={control}
                 render={({ field }) => (
                   <input
@@ -133,7 +181,8 @@ const ExchangeAction = () => {
                 )}
               />
               <span>
-                달러 {actionState === EXCAHNGE_ACTION.BUY ? '사기' : '팔기'}
+                {getCurrencyKrName(currencyState)?.value.split(' ')[1]}{' '}
+                {actionState === ORDER_ACTION.BUY ? '사기' : '팔기'}
               </span>
             </div>
           </div>
@@ -146,12 +195,18 @@ const ExchangeAction = () => {
               <input
                 type="text"
                 className="text-switchwon-gray-600 flex-1 text-right text-xl font-semibold"
+                value={
+                  quoteMutation.data
+                    ? formatNumber(quoteMutation.data?.krwAmount)
+                    : 0
+                }
+                disabled
               />
               <span
-                className={`font-semibold ${actionState === EXCAHNGE_ACTION.BUY ? 'text-switchwon-red' : 'text-switchwon-blue-500'}`}
+                className={`font-semibold ${actionState === ORDER_ACTION.BUY ? 'text-switchwon-red' : 'text-switchwon-blue-500'}`}
               >
                 원{' '}
-                {actionState === EXCAHNGE_ACTION.BUY
+                {actionState === ORDER_ACTION.BUY
                   ? '필요해요'
                   : '받을 수 있어요'}
               </span>
@@ -160,15 +215,10 @@ const ExchangeAction = () => {
         </div>
         <div className="border-t-switchwon-gray-400 flex justify-between border-t pt-8 text-xl">
           <span className="text-switchwon-gray-600 font-medium">적용 환율</span>
-          <b className="text-switchwon-blue-500 font-bold">
-            1 USD = 1,320.50 원
-          </b>
+          <b className="text-switchwon-blue-500 font-bold">{appliedRate} 원</b>
         </div>
 
-        <button
-          type="button"
-          className="bg-switchwon-cta-1 mt-8 h-[77px] rounded-2xl text-[22px] font-bold text-white"
-        >
+        <button className="bg-switchwon-cta-1 mt-8 h-[77px] rounded-2xl text-[22px] font-bold text-white">
           환전하기
         </button>
       </form>
