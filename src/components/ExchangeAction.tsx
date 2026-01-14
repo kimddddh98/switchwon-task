@@ -1,5 +1,15 @@
 import { useState } from 'react'
 import ChevronDownIcon from '@/assets/icons/chevron-down.svg?react'
+import {
+  Controller,
+  useForm,
+  type ControllerRenderProps,
+} from 'react-hook-form'
+import { formatNumber } from '@/utiles'
+import useQuoteMutation from '@/hooks/mutations/useQuoteMutation'
+type OrdersFormValue = {
+  amount: string
+}
 
 type ExchangeActionType = 'BUY' | 'SELL'
 
@@ -28,21 +38,55 @@ const ExchangeLayer = () => {
 }
 
 const ExchangeAction = () => {
+  const { quoteMutation } = useQuoteMutation()
+
+  const { control, handleSubmit } = useForm<OrdersFormValue>({
+    defaultValues: {
+      amount: '0',
+    },
+  })
   const [actionState, setActionState] = useState<ExchangeActionType>(
     EXCAHNGE_ACTION.BUY,
   )
   const [layerVisible, setLayerVisible] = useState(false)
+
   const handleActionState = (state: ExchangeActionType) => {
     setActionState(state)
   }
   const handleLayerToggle = () => {
     setLayerVisible((prev) => !prev)
   }
+
+  const handleNumberChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    field: ControllerRenderProps<OrdersFormValue, 'amount'>,
+  ) => {
+    const raw = e.target.value.replace(/,/g, '')
+    if (!/^\d*\.?\d*$/.test(raw)) return
+    const [int, decimal] = raw.split('.')
+    if (decimal && decimal.length > 2) {
+      alert('소숫점 2번째 자리까지 입력 가능합니다.')
+      return
+    }
+    field.onChange(raw)
+  }
+
+  const formatValue = (value: string) => {
+    const [int, decimal] = value.split('.')
+    if (value.endsWith('.')) {
+      const intVal = formatNumber(Number(int))
+      return intVal + '.' + decimal
+    }
+
+    return formatNumber(Number(value))
+  }
+
   return (
     <div className="bg-switchwon-gray-0 border-switchwon-gray-300 flex flex-col gap-8 rounded-2xl border px-8 py-6">
-      <div className="flex flex-col gap-4">
+      <form className="flex flex-col gap-4">
         <div className="relative">
           <button
+            type="button"
             onClick={handleLayerToggle}
             className="text-switchwon-gray-800 inline-flex items-center gap-1 text-xl font-bold"
           >
@@ -54,12 +98,14 @@ const ExchangeAction = () => {
 
         <div className="border-switchwon-gray-300 flex rounded-2xl border bg-white p-3">
           <button
+            type="button"
             onClick={() => handleActionState(EXCAHNGE_ACTION.BUY)}
             className={`flex-1 rounded-2xl py-4 text-xl font-bold transition ${actionState === EXCAHNGE_ACTION.BUY ? 'bg-switchwon-red text-white' : 'text-switchwon-red-disabled'}`}
           >
             살래요
           </button>
           <button
+            type="button"
             onClick={() => handleActionState(EXCAHNGE_ACTION.SELL)}
             className={`flex-1 rounded-2xl py-4 text-xl font-bold transition ${actionState === EXCAHNGE_ACTION.SELL ? 'bg-switchwon-blue-500 text-white' : 'text-switchwon-blue-disabled'}`}
           >
@@ -73,9 +119,18 @@ const ExchangeAction = () => {
               {actionState === EXCAHNGE_ACTION.BUY ? '매수' : '매도'} 금액
             </span>
             <div className="border-switchwon-gray-700 text-switchwon-gray-600 mt-3 flex items-center gap-2.5 rounded-xl border bg-white p-4 text-right text-xl font-medium">
-              <input
-                type="text"
-                className="text-switchwon-gray-600 flex-1 text-right text-xl font-semibold"
+              <Controller
+                name="amount"
+                control={control}
+                render={({ field }) => (
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={formatValue(field.value)}
+                    className="text-switchwon-gray-600 flex-1 text-right text-xl font-semibold"
+                    onChange={(e) => handleNumberChange(e, field)}
+                  />
+                )}
               />
               <span>
                 달러 {actionState === EXCAHNGE_ACTION.BUY ? '사기' : '팔기'}
@@ -110,10 +165,13 @@ const ExchangeAction = () => {
           </b>
         </div>
 
-        <button className="bg-switchwon-cta-1 mt-8 h-[77px] rounded-2xl text-[22px] font-bold text-white">
+        <button
+          type="button"
+          className="bg-switchwon-cta-1 mt-8 h-[77px] rounded-2xl text-[22px] font-bold text-white"
+        >
           환전하기
         </button>
-      </div>
+      </form>
     </div>
   )
 }
