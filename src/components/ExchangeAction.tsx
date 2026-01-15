@@ -18,7 +18,6 @@ import {
   type CurrencyType,
 } from '@/const/currency.const'
 import { ORDER_ACTION, type OrderActionType } from '@/const/orders.const'
-import { requestOrder } from '@/api/orders'
 import useRequestOrderMutation from '@/hooks/mutations/useRequestOrderMutation'
 
 type QuoteFormValue = {
