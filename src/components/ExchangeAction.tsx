@@ -19,6 +19,7 @@ import {
 } from '@/const/currency.const'
 import { ORDER_ACTION, type OrderActionType } from '@/const/orders.const'
 import useRequestOrderMutation from '@/hooks/mutations/useRequestOrderMutation'
+import { TOAST_TYPE, useToastActions } from '@/store/toastStore'
 
 type QuoteFormValue = {
   forexAmount: string
@@ -28,12 +29,13 @@ const ExchangeAction = () => {
   const queryClient = useQueryClient()
   const { quoteMutation } = useQuoteMutation()
   const { requestOrderMutation } = useRequestOrderMutation()
+  const { toastShow } = useToastActions()
 
   const exchangeData = queryClient.getQueryData<ExchangeRate[]>(
     exchangeKey.exchnageRates(),
   )
 
-  const { control, handleSubmit } = useForm<QuoteFormValue>({
+  const { control, handleSubmit, setValue } = useForm<QuoteFormValue>({
     defaultValues: {
       forexAmount: '0',
     },
@@ -79,6 +81,7 @@ const ExchangeAction = () => {
   const handleCurrencyState = (state: CurrencyType) => {
     quoteMutation.reset()
     setCurrencyState(state)
+    setValue('forexAmount', '0')
     handleLayerToggle()
   }
 
@@ -88,9 +91,10 @@ const ExchangeAction = () => {
   ) => {
     const raw = e.target.value.replace(/,/g, '')
     if (!/^\d*\.?\d*$/.test(raw)) return
+
     const [_, decimal] = raw.split('.')
     if (decimal && decimal.length > 2) {
-      alert('소숫점 2번째 자리까지 입력 가능합니다.')
+      toastShow(TOAST_TYPE.SUCCESS, '소숫점 2번째 자리까지 입력 가능합니다.')
       return
     }
     field.onChange(raw)
@@ -118,7 +122,7 @@ const ExchangeAction = () => {
 
   const onSubmit = ({ forexAmount }: QuoteFormValue) => {
     if (Number(forexAmount) <= 0) {
-      return alert('주문금액은 0보다 커야 합니다.')
+      return toastShow(TOAST_TYPE.ERROR, '주문금액은 0보다 커야 합니다.')
     }
     requestOrderMutation.mutate({
       forexAmount: Number(forexAmount),
