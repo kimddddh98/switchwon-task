@@ -1,6 +1,8 @@
 import URL from '@/const/urls.const'
 import axios from 'axios'
-import { getAccessToken } from './auth'
+import { getAccessToken, removeAccessToken } from './auth'
+import { ERROR_CODES } from '@/const/errors.const'
+import { ROUTES } from '@/routes/path'
 
 export const http = axios.create({
   baseURL: URL.baseUrl,
@@ -26,6 +28,17 @@ http.interceptors.request.use(
 http.interceptors.response.use(
   (response) => response,
   async (error) => {
+    if (error) {
+      // 401 에러 처리
+      if (error.response.data.code === ERROR_CODES.UNAUTHORIZED) {
+        removeAccessToken()
+        window.location.href = ROUTES.SIGN_IN
+      }
+      console.log('에러 발생', error?.response?.data)
+      if (error?.response?.data) {
+        return Promise.reject(error?.response?.data)
+      }
+    }
     return Promise.reject(error)
   },
 )
