@@ -1,7 +1,10 @@
 import { getExchangeRates } from '@/api/exchange'
 import { requestOrder, type RequestOrdersParams } from '@/api/orders'
 import type { CurrencyType } from '@/const/currency.const'
+import { ERROR_CODES } from '@/const/errors.const'
 import { exchangeKey } from '@/const/query-key/exchangeKey.const'
+import { TOAST_TYPE, useToastActions } from '@/store/toastStore'
+import { formatNumber } from '@/utiles'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 interface RequestOrdersMutationParams extends Omit<
@@ -13,55 +16,52 @@ interface RequestOrdersMutationParams extends Omit<
 
 const useRequestOrderMutation = () => {
   const queryClient = useQueryClient()
+  const { toastShow } = useToastActions()
   const requestOrderMutation = useMutation({
     mutationFn: async (params: RequestOrdersMutationParams) => {
-      try {
-        const exchangeResponse = await queryClient.fetchQuery({
-          queryKey: exchangeKey.exchnageRates(),
-          queryFn: getExchangeRates,
-          retry: 1,
-        })
-        const rateId = exchangeResponse?.find(
-          (r) => r.currency === params.currencyState,
-        )?.exchangeRateId
-        if (!rateId) throw new Error('환율 정보를 찾을 수 없습니다.')
-        return requestOrder({ ...params, exchangeRateId: rateId })
-      } catch (error) {
+      const exchangeResponse = await queryClient.fetchQuery({
+        queryKey: exchangeKey.exchnageRates(),
+        queryFn: getExchangeRates,
+        retry: 1,
+      })
+      const findRate = exchangeResponse?.find(
+        (r) => r.currency === params.currencyState,
+      )
+      if (!findRate) {
         throw {
-          error,
+          message: `${params.currencyState} 환율정보를 찾을 수 없습니다. 잠시 후 다시 시도해주세요.`,
         }
       }
+
+      const { exchangeRateId, rate } = findRate
+      const orderResponse = await requestOrder({
+        ...params,
+        exchangeRateId,
+      })
+      return { ...orderResponse, rate }
     },
-    onSuccess: async (data, variables) => {
+    onSuccess: async (data) => {
       queryClient.invalidateQueries({
         queryKey: exchangeKey.wallets(),
       })
-      alert(data.message)
+      toastShow(
+        TOAST_TYPE.SUCCESS,
+        `${data.message} 적용 환율 : ${formatNumber(data?.rate)}`,
+      )
     },
-    onError(error, variables, onMutateResult, context) {
-      /* 
-        TODO : 에러 테스트
-
-        INVALID_AMOUNT_SCALE
-        JPY 통화는 소수점 0자리까지만 허용됩니다. 입력된 소수점 자릿수: 1
-
-        INVALID_AMOUNT_MIN
-        USD 통화는 최소 주문 금액이 1 이상이어야 합니다. 입력된 금액: 0.1
-
-        VALIDATION_ERROR forexAmount
-        주문금액은 0보다 커야 합니다.
-      */
-
-      console.log('환전 주문중 에러 발생', error)
-
-      // if (error?.code === 'WALLET_INSUFFICIENT_BALANCE') {
-      //   alert(error.message)
-      // } else if (error?.code === 'VALIDATION_ERROR') {
-      //   alert(error.data?.forexAmount)
-      // } else if (error.code === 'INVALID_AMOUNT_MIN') {
-      //   alert(error.message)
-      // } else {
-      // }
+    onError: (error: BaseResponse<Partial<RequestOrdersMutationParams>>) => {
+      const { code, data, message } = error
+      if (code === ERROR_CODES.VALIDATION_ERROR) {
+        let text = ''
+        for (const value of Object.values(data)) {
+          if (value) {
+            text += value + ''
+          }
+        }
+        toastShow(TOAST_TYPE.ERROR, text)
+      } else if (message) {
+        toastShow(TOAST_TYPE.ERROR, message)
+      }
     },
   })
 
