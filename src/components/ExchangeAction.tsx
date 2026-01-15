@@ -18,6 +18,8 @@ import {
   type CurrencyType,
 } from '@/const/currency.const'
 import { ORDER_ACTION, type OrderActionType } from '@/const/orders.const'
+import { requestOrder } from '@/api/orders'
+import useRequestOrderMutation from '@/hooks/mutations/useRequestOrderMutation'
 
 type QuoteFormValue = {
   forexAmount: string
@@ -26,6 +28,7 @@ type QuoteFormValue = {
 const ExchangeAction = () => {
   const queryClient = useQueryClient()
   const { quoteMutation } = useQuoteMutation()
+  const { requestOrderMutation } = useRequestOrderMutation()
 
   const exchangeData = queryClient.getQueryData<ExchangeRate[]>(
     exchangeKey.exchnageRates(),
@@ -115,11 +118,14 @@ const ExchangeAction = () => {
   }
 
   const onSubmit = ({ forexAmount }: QuoteFormValue) => {
-    quoteMutation.mutate({
+    if (Number(forexAmount) <= 0) {
+      return alert('주문금액은 0보다 커야 합니다.')
+    }
+    requestOrderMutation.mutate({
       forexAmount: Number(forexAmount),
       fromCurrency: actionState === ORDER_ACTION.BUY ? 'KRW' : currencyState,
       toCurrency: actionState === ORDER_ACTION.BUY ? currencyState : 'KRW',
-      actionState,
+      currencyState,
     })
   }
 

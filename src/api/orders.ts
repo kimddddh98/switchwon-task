@@ -24,7 +24,7 @@ export interface OrdersQuoteResponseType {
   appliedRate: number
 }
 
-export interface RquestOrdersParams extends OrdersQuoteRequestQuery {
+export interface RequestOrdersParams extends OrdersQuoteRequestQuery {
   exchangeRateId: number
 }
 
@@ -39,10 +39,13 @@ const getOrdersQuote = async (query: OrdersQuoteRequestQuery) => {
   return response.data.data
 }
 
-const requestOrder = async (params: RquestOrdersParams) => {
-  const response = await http.post(ORDERS_ENDPOINTS.OREDRS, params)
+const requestOrder = async (params: RequestOrdersParams) => {
+  const response = await http.post<BaseResponse<0>>(
+    ORDERS_ENDPOINTS.OREDRS,
+    params,
+  )
 
-  return response.data.data
+  return response.data
 }
 
 export { getOrdersQuote, requestOrder }
