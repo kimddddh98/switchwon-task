@@ -1,10 +1,42 @@
+import type { Orders } from '@/api/orders'
+import useGetOrdersQuery from '@/hooks/queries/useGetOrdersQuery'
+import { formatNumber, getCurrencySymbol } from '@/utiles'
+
+type ExchangeListItemProps = {
+  order: Orders
+}
+const ExchangeListItem = ({ order }: ExchangeListItemProps) => {
+  const [date, time] = order.orderedAt.split('T')
+  return (
+    <tr
+      className="first:[&>td]:pt-5.5 [&>td:first-child]:pl-10 [&>td:last-child]:pr-10"
+      key={order.orderId}
+    >
+      <td className="text-switchwon-gray-700 px-4 py-3.5">{order.orderId}</td>
+      <td className="text-switchwon-gray-700 px-4 py-3.5">{`${date} ${time}`}</td>
+      <td className="text-switchwon-gray-700 px-4 py-3.5">
+        {formatNumber(order.toAmount)}{' '}
+        {getCurrencySymbol(order.toCurrency)?.value}
+      </td>
+      <td className="text-switchwon-gray-700 px-4 py-3.5">
+        {order.appliedRate}
+      </td>
+      <td className="text-switchwon-gray-700 px-4 py-3.5">
+        {formatNumber(order.fromAmount)}{' '}
+        {getCurrencySymbol(order.fromCurrency)?.value}
+      </td>
+    </tr>
+  )
+}
+
 const ExchangeList = () => {
+  const { data } = useGetOrdersQuery()
+
   return (
     <div className="border-switchwon-gray-300 rounded-2xl border py-4">
       <table className="w-full border-collapse">
         <colgroup>
           <col />
-          {/* <col className="w-[180px]" /> */}
           <col />
           <col />
           <col />
@@ -30,19 +62,8 @@ const ExchangeList = () => {
           </tr>
         </thead>
         <tbody className="">
-          {Array.from({ length: 10 }, (_, i) => i + 1).map((data) => (
-            <tr
-              className="first:[&>td]:pt-5.5 [&>td:first-child]:pl-10 [&>td:last-child]:pr-10"
-              key={data}
-            >
-              <td className="text-switchwon-gray-700 px-4 py-3.5">{data}</td>
-              <td className="text-switchwon-gray-700 px-4 py-3.5">
-                2024-01-01 00:00:00
-              </td>
-              <td className="text-switchwon-gray-700 px-4 py-3.5">활성</td>
-              <td className="text-switchwon-gray-700 px-4 py-3.5">활성</td>
-              <td className="text-switchwon-gray-700 px-4 py-3.5">활성</td>
-            </tr>
+          {data?.map((order) => (
+            <ExchangeListItem key={order.orderId} order={order} />
           ))}
         </tbody>
       </table>

@@ -1,9 +1,10 @@
 import { useAuth } from '@/hooks/useAuth'
 import { ROUTES } from '@/routes/path'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 
 const Header = () => {
   const { logout } = useAuth()
+  const { pathname } = useLocation()
   const handleLogout = () => {
     logout()
   }
@@ -14,13 +15,13 @@ const Header = () => {
         <div>
           <NavLink
             to={ROUTES.EXCHANGE}
-            className={`px-3 py-2 text-xl font-bold`}
+            className={`px-3 py-2 text-xl font-bold ${pathname === ROUTES.EXCHANGE ? 'px-3 py-2 text-xl font-bold' : 'px-3 py-2 text-xl font-medium text-[#8899AA]'}`}
           >
             환전 하기
           </NavLink>
           <NavLink
             to={ROUTES.EXCHANGE_LIST}
-            className="px-3 py-2 text-xl font-medium text-[#8899AA]"
+            className={`px-3 py-2 text-xl font-bold ${pathname === ROUTES.EXCHANGE_LIST ? 'px-3 py-2 text-xl font-bold' : 'px-3 py-2 text-xl font-medium text-[#8899AA]'}`}
           >
             환전 내역
           </NavLink>
