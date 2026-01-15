@@ -31,7 +31,6 @@ const ExchangeListItem = ({ order }: ExchangeListItemProps) => {
 
 const ExchangeList = () => {
   const { data } = useGetOrdersQuery()
-  console.log('환전내역', data)
 
   return (
     <div className="border-switchwon-gray-300 rounded-2xl border py-4">
