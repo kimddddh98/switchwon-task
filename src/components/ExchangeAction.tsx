@@ -94,7 +94,7 @@ const ExchangeAction = () => {
 
     const [_, decimal] = raw.split('.')
     if (decimal && decimal.length > 2) {
-      toastShow(TOAST_TYPE.SUCCESS, '소숫점 2번째 자리까지 입력 가능합니다.')
+      toastShow(TOAST_TYPE.ERROR, '소숫점 2번째 자리까지 입력 가능합니다.')
       return
     }
     field.onChange(raw)
