@@ -1,12 +1,29 @@
 import { CURRENCIES, type CurrencyType } from '@/const/currency.const'
+import { useEffect, useRef } from 'react'
 
 type ExchangeLayerProps = {
   onClick: (state: CurrencyType) => void
+  onLayerClose: () => void
 }
 
-const ExchangeLayer = ({ onClick }: ExchangeLayerProps) => {
+const ExchangeLayer = ({ onClick, onLayerClose }: ExchangeLayerProps) => {
+  const layerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (!layerRef.current?.contains(e.target as Node)) {
+        onLayerClose()
+      }
+    }
+
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [onLayerClose])
   return (
-    <ul className="border-switchwon-gray-200 animate-fade-in absolute top-[calc(100%+8px)] left-0 w-[140px] rounded-2xl border bg-white py-2">
+    <ul
+      ref={layerRef}
+      className="border-switchwon-gray-200 animate-fade-in absolute top-[calc(100%+8px)] left-0 w-[140px] rounded-2xl border bg-white py-2"
+    >
       {Object.values(CURRENCIES).map((currency) => (
         <li key={currency.currency}>
           <button
