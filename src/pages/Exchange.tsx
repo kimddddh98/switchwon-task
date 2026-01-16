@@ -6,9 +6,9 @@ import useExchangeRatesQuery from '@/hooks/queries/useExchangeRatesQuery'
 const Exchange = () => {
   const { data } = useExchangeRatesQuery()
   return (
-    <section className="flex gap-6 pb-12">
-      <div className="flex flex-1 flex-col gap-6">
-        <div className="flex gap-5">
+    <section className="flex flex-col gap-6 md:flex-row">
+      <div className="flex flex-col gap-6 md:flex-1">
+        <div className="flex flex-col gap-5 md:flex-row">
           {data?.map((ex) => (
             <ExchangeInfoCard key={ex.exchangeRateId} exchange={ex} />
           ))}

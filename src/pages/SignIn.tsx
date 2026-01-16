@@ -69,7 +69,7 @@ const SignIn = () => {
         <button
           type="submit"
           disabled={isPending}
-          className="bg-switchwon-cta-1 mt-4 h-14 cursor-pointer rounded-2xl text-lg font-bold text-white md:h-16 xl:mt-8 xl:h-[77px] xl:text-[22px]"
+          className="bg-switchwon-cta-1 mt-4 h-14 rounded-2xl text-lg font-bold text-white md:h-16 xl:mt-8 xl:h-[77px] xl:text-[22px]"
         >
           로그인 하기
         </button>

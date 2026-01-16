@@ -23,7 +23,11 @@ const Drawer = ({ isVisible, toggleDrawer }: DrawerProps) => {
             menuNm="환전 하기"
             onClick={toggleDrawer}
           />
-          <NavButton path={ROUTES_KEY.EXCHANGE_LIST} menuNm="환전 내역" />
+          <NavButton
+            path={ROUTES_KEY.EXCHANGE_LIST}
+            menuNm="환전 내역"
+            onClick={toggleDrawer}
+          />
         </nav>
         <LogoutButton />
       </aside>
