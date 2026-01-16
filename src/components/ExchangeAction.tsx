@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import debounce from 'lodash.debounce'
 import ChevronDownIcon from '@/assets/icons/chevron-down.svg?react'
 import {
@@ -161,7 +161,12 @@ const ExchangeAction = () => {
               className={`h-5 w-5 md:h-6 md:w-6 ${!layerVisible && 'rotate-180'}`}
             />
           </button>
-          {layerVisible && <ExchangeLayer onClick={handleCurrencyState} />}
+          {layerVisible && (
+            <ExchangeLayer
+              onClick={handleCurrencyState}
+              onLayerClose={() => setLayerVisible(false)}
+            />
+          )}
         </div>
 
         <div className="border-switchwon-gray-300 flex rounded-2xl border bg-white p-2 xl:p-3">
