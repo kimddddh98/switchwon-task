@@ -62,10 +62,22 @@ const ExchangeList = () => {
               </th>
             </tr>
           </thead>
+
           <tbody className="">
-            {data?.map((order) => (
-              <ExchangeListItem key={order.orderId} order={order} />
-            ))}
+            {data ? (
+              data?.map((order) => (
+                <ExchangeListItem key={order.orderId} order={order} />
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan={5}
+                  className="text-switchwon-gray-700 px-4 py-3.5 text-center"
+                >
+                  환전 내역이 없습니다.{' '}
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

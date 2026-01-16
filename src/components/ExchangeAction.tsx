@@ -157,6 +157,7 @@ const ExchangeAction = () => {
           >
             {CURRENCIES[currencyState].icon + ' ' + currencyState} 환전하기
             <ChevronDownIcon
+              color="#000"
               className={`h-5 w-5 md:h-6 md:w-6 ${!layerVisible && 'rotate-180'}`}
             />
           </button>
@@ -205,7 +206,12 @@ const ExchangeAction = () => {
               </span>
             </div>
           </div>
-          <div className="bg-switchwon-gray-300 h-8 w-8 self-center rounded-full md:h-10 md:w-10"></div>
+          <div className="bg-switchwon-gray-300 flex h-8 w-8 items-center justify-center self-center rounded-full md:h-10 md:w-10">
+            <ChevronDownIcon
+              color="#fff"
+              className={`h-5 w-5 md:h-6 md:w-6 ${!layerVisible && 'rotate-180'}`}
+            />
+          </div>
           <div className="flex flex-col">
             <span className="text-switchwon-gray-600 text-lg font-medium xl:text-xl">
               필요 원화
