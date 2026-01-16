@@ -124,12 +124,20 @@ const ExchangeAction = () => {
     if (Number(forexAmount) <= 0) {
       return toastShow(TOAST_TYPE.ERROR, '주문금액은 0보다 커야 합니다.')
     }
-    requestOrderMutation.mutate({
-      forexAmount: Number(forexAmount),
-      fromCurrency: actionState === ORDER_ACTION.BUY ? 'KRW' : currencyState,
-      toCurrency: actionState === ORDER_ACTION.BUY ? currencyState : 'KRW',
-      currencyState,
-    })
+    requestOrderMutation.mutate(
+      {
+        forexAmount: Number(forexAmount),
+        fromCurrency: actionState === ORDER_ACTION.BUY ? 'KRW' : currencyState,
+        toCurrency: actionState === ORDER_ACTION.BUY ? currencyState : 'KRW',
+        currencyState,
+      },
+      {
+        onSuccess: () => {
+          setValue('forexAmount', '0')
+          quoteMutation.reset()
+        },
+      },
+    )
   }
 
   useEffect(() => {
