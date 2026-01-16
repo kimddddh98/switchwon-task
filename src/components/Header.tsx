@@ -11,7 +11,9 @@ const Header = () => {
   }
   return (
     <header className="border-b-switchwon-gray-300 flex h-[75px] items-center justify-between border-b px-4 xl:px-10">
-      <div className="font-bold xl:text-2xl">Exchange app</div>
+      <div className="pointer-events-none font-bold xl:text-2xl">
+        Exchange app
+      </div>
       <nav className="hidden items-center gap-10 md:flex">
         <div>
           <NavButton path={ROUTES_KEY.EXCHANGE} menuNm="환전 하기" />
