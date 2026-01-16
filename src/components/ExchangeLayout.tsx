@@ -13,7 +13,7 @@ const ExchangeLayout = () => {
   return (
     <div>
       <Header />
-      <main className="mx-auto mt-10 flex w-7xl flex-col gap-6">
+      <main className="mt-10 flex w-full flex-col gap-6 xl:mx-auto xl:w-7xl">
         <div>
           <h2 className="text-switchwon-gray-800 text-[40px] font-bold">
             {handle?.title}
