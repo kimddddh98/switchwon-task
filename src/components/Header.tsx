@@ -1,38 +1,30 @@
-import { useAuth } from '@/hooks/useAuth'
-import { ROUTES } from '@/routes/path'
-import { NavLink, useLocation } from 'react-router-dom'
-
+import { ROUTES_KEY } from '@/routes/path'
+import Drawer from './Drawer'
+import LogoutButton from './LogoutButton'
+import NavButton from './NavButton'
+import { useState } from 'react'
+import DrawerIcon from '@/assets/icons/drawer.svg?react'
 const Header = () => {
-  const { logout } = useAuth()
-  const { pathname } = useLocation()
-  const handleLogout = () => {
-    logout()
+  const [drawerVisible, setDrawerVisible] = useState(false)
+  const toggleDrawer = () => {
+    setDrawerVisible((prev) => !prev)
   }
   return (
-    <header className="border-b-switchwon-gray-300 flex h-[75px] items-center justify-between border-b px-10">
-      <div className="text-2xl font-bold">Exchange app</div>
-      <nav className="flex items-center gap-10">
+    <header className="border-b-switchwon-gray-300 flex h-[75px] items-center justify-between border-b px-4 xl:px-10">
+      <div className="pointer-events-none font-bold xl:text-2xl">
+        Exchange app
+      </div>
+      <nav className="hidden items-center gap-10 md:flex">
         <div>
-          <NavLink
-            to={ROUTES.EXCHANGE}
-            className={`px-3 py-2 text-xl font-bold ${pathname === ROUTES.EXCHANGE ? 'px-3 py-2 text-xl font-bold' : 'px-3 py-2 text-xl font-medium text-[#8899AA]'}`}
-          >
-            환전 하기
-          </NavLink>
-          <NavLink
-            to={ROUTES.EXCHANGE_LIST}
-            className={`px-3 py-2 text-xl font-bold ${pathname === ROUTES.EXCHANGE_LIST ? 'px-3 py-2 text-xl font-bold' : 'px-3 py-2 text-xl font-medium text-[#8899AA]'}`}
-          >
-            환전 내역
-          </NavLink>
+          <NavButton path={ROUTES_KEY.EXCHANGE} menuNm="환전 하기" />
+          <NavButton path={ROUTES_KEY.EXCHANGE_LIST} menuNm="환전 내역" />
         </div>
-        <button
-          onClick={handleLogout}
-          className="bg-switchwon-blue-500 rounded-2xl px-3 py-2 text-xl font-semibold text-white"
-        >
-          Log out
-        </button>
+        <LogoutButton />
       </nav>
+      <button className="md:hidden" onClick={toggleDrawer}>
+        <DrawerIcon />
+      </button>
+      <Drawer isVisible={drawerVisible} toggleDrawer={toggleDrawer} />
     </header>
   )
 }
