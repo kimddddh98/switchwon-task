@@ -60,19 +60,14 @@ src/
 
 ## 시작하기
 
-
-
-### 환경 변수 설정
-
-프로젝트 루트에 `.env` 파일을 생성하고 다음 변수를 설정하세요:
-
 ```env
 VITE_API_PROXY_URL=your_proxy_api_base_url
-VITE_WEB_BASE_URL=your_web_base_url
-VITE_API_BASE_URL=your_api_base_url
+VITE_WEB_BASE_URL=your_web_base_url (/api)
+VITE_API_BASE_URL=your_api_base_url  (http://localhost:3000)
 ```
 
-### 개발 서버 실행
+AND
+
 ```bash
 npm run install
 npm run dev
