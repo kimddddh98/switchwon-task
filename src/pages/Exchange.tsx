@@ -8,11 +8,14 @@ const Exchange = () => {
   return (
     <section className="flex flex-col gap-6 md:flex-row">
       <div className="flex flex-col gap-6 md:flex-1">
-        <div className="flex flex-col gap-5 md:flex-row">
-          {data?.map((ex) => (
-            <ExchangeInfoCard key={ex.exchangeRateId} exchange={ex} />
-          ))}
-        </div>
+        {data && (
+          <div className="flex flex-col gap-5 md:flex-row">
+            {data?.map((ex) => (
+              <ExchangeInfoCard key={ex.exchangeRateId} exchange={ex} />
+            ))}
+          </div>
+        )}
+
         <MyWallet />
       </div>
       <div className="flex-1">
